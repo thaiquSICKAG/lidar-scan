@@ -1,10 +1,24 @@
 import os
+import tomllib
+from pathlib import Path
+
+
+def _read_version() -> str:
+    pyproject = Path(__file__).resolve().parent.parent.parent / "pyproject.toml"
+    try:
+        with open(pyproject, "rb") as f:
+            return tomllib.load(f)["project"]["version"]
+    except Exception:
+        return "0.0.0-dev"
+
+
+_APP_VERSION = _read_version()
 
 
 class Settings:
     # API Settings
     PROJECT_NAME: str = "Lidar Standalone API"
-    VERSION: str = "1.3.0"
+    VERSION: str = _APP_VERSION
     HOST: str = os.getenv("HOST", "0.0.0.0")
     PORT: int = int(os.getenv("PORT", 8005))
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
