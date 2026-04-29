@@ -99,7 +99,6 @@ RUN uv sync --frozen --no-dev --compile-bytecode \
      nest_asyncio.py \
   && cd /app \
   && find .venv -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true \
-  && find .venv -type d -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true \
   && find .venv -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true \
   && find .venv -type d -name "test" -exec rm -rf {} + 2>/dev/null || true \
   #
@@ -112,10 +111,11 @@ RUN uv sync --frozen --no-dev --compile-bytecode \
   # geometry/registration — not visualization.  Wrap in try/except.
   #
   && python -c "\
+import re; \
 p='.venv/lib/python3.12/site-packages/open3d/__init__.py'; \
 t=open(p).read(); \
-t=t.replace('import open3d.visualization','try:\n    import open3d.visualization\nexcept ImportError:\n    pass'); \
-t=t.replace('import open3d.ml','try:\n    import open3d.ml\nexcept ImportError:\n    pass'); \
+t=re.sub(r'^(import open3d\.visualization)$', r'try:\n    \1\nexcept ImportError:\n    pass', t, flags=re.MULTILINE); \
+t=re.sub(r'^(import open3d\.ml)$', r'try:\n    \1\nexcept ImportError:\n    pass', t, flags=re.MULTILINE); \
 open(p,'w').write(t)"
 
 # ----------------------------------------
