@@ -213,6 +213,7 @@ export class SettingsComponent implements OnInit, HasUnsavedChanges {
     const config = this.pendingImportConfig();
     if (!config) return;
 
+    this.isImporting.set(true);
     this.configTransfer.importConfig(config, this.importMergeMode()).subscribe({
       next: (result) => {
         this.showValidationDialog.set(false);
@@ -236,6 +237,7 @@ export class SettingsComponent implements OnInit, HasUnsavedChanges {
         this.validationResult.set(validation);
         this.pendingImportConfig.set(config);
         this.showValidationDialog.set(true);
+        this.isImporting.set(false);
 
         if (!validation.valid) {
           this.toast.warning('Configuration has validation errors. Please review.');
